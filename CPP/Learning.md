@@ -15,9 +15,9 @@ STL is a special library primarily consisting of containers, iterators, algorith
  
   1. STL Containers are classified into sequence, associative and container adaptors.
  
-    - Sequence containers* maintain the ordering of the elements inserted and one can choose where to insert in a sequence container. e.g STL has 6 sequence containers std::vector, std::deque(pronounced “deck”), std::array, std::list, std::forward_list, and std::basic_string.
-    - Associative container* : The elements are sorted when they are inserted. e.g. std::set, std::multiset (duplicates are allowed), std::map (associative array), std::multimap (disctionary, multiple values for keys are alowed)
-    - Container adaptors : Predefined adaptors for specific uses. e.g. std::stack, std::queue, std::priority_queue
+    * Sequence containers* maintain the ordering of the elements inserted and one can choose where to insert in a sequence container. e.g STL has 6 sequence containers std::vector, std::deque(pronounced “deck”), std::array, std::list, std::forward_list, and std::basic_string.
+    * Associative container* : The elements are sorted when they are inserted. e.g. std::set, std::multiset (duplicates are allowed), std::map (associative array), std::multimap (disctionary, multiple values for keys are alowed)
+    * Container adaptors : Predefined adaptors for specific uses. e.g. std::stack, std::queue, std::priority_queue
 
 ### Iterators
 
