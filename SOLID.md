@@ -3,8 +3,8 @@
 2. Allow separations of concerns e.g. Algorithms can be de-entangled with OS details.
 
 
-# SOLID principles
-## What are the usual problems seen in Design.
+## SOLID principles
+### What are the usual problems seen in Design.
 
 Conside the game of black jack represented using following classes in python
 
@@ -36,25 +36,14 @@ class Shoe(Card):
 ```
 
 We have some problems like 
-### Mixed Resposibilities 
-The class *Card* has methond *points* which calculates the value in a certain way. If the Game is changed or a new game has to be supported the *points* computation will need to change. 
+* Mixed Resposibilities : The class *Card* has methond *points* which calculates the value in a certain way. If the Game is changed or a new game has to be supported the *points* computation will need to change. 
+* Missing Responsibilities : For a Black Jack game where the total is computed is not known.
+* Limited reuse pottential : Cannot reuse for some other game like poker.
+* Not substitutable : Card class cannot be substitued with another class (let say called) Deck.
+* Poor Constructor design : Classes are tightly coupled through the constructor.
+* Haphazard interface : No iterators in Deck or Shoe.
 
-### Missing Responsibilities
-For a Black Jack game where the total is computed is not known.
-
-### Limited reuse pottential 
-Cannot reuse for some other game like poker.
-
-### Not substitutable
-Card class cannot be substitued with another class (let say called) Deck.
-
-### Poor Constructor design
-Classes are tightly coupled through the constructor.
-
-### Haphazard interface
-No iterators in Deck or Shoe.
-
-## SOLID
+## SOLID - Guidlines to avoid design problems
 1. S : Single resposibility
 1.1 Kind of a summation of all the below. 
 
