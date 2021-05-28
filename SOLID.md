@@ -207,8 +207,8 @@ A class should have a single reposponsibility. Consider an example
 const string Prefix = "user-";
 
 struct UserManager {
-	UserManager(Database &DB) : db(DB) {
-		// Add the prefix
+	UserManager(Database &DB, string UserName) : db(DB) {
+		// Add the prefix to UserName
 		// Push to DB
 	}
 	string getUserReport() { 
