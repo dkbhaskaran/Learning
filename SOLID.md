@@ -151,7 +151,7 @@ Open for extention and closed for modification. It summarizes the Interface segr
 ### Dependency inversion priciple
 Two elements
 1. High level modules should not depend on low level modules.
-2. abstaction should not depend on details and details should not depend on abstaction.
+2. abstaction should not depend on details and details should depend on abstaction.
 
 for example 
 ```
