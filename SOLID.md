@@ -174,7 +174,7 @@ struct Cloud {
 	void uploadToS3Bucket(string filepath) = 0;
 };
 
-struct AwsCloud {
+struct AwsCloud : public Cloud {
     void uploadToS3Bucket(string filepath) override { /* ... */ }	
 };
 
@@ -192,7 +192,11 @@ struct Cloud {
 	void upload(string filepath) = 0;
 };
 
-struct AwsCloud {
+struct AwsCloud : public Cloud {
+    void upload(string filepath) override { /* ... */ }	
+};
+
+struct GoogleCloud : public Cloud {
     void upload(string filepath) override { /* ... */ }	
 };
 ```
