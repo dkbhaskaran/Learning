@@ -211,7 +211,7 @@ struct UserManager {
 		// Add the prefix to UserName
 		// Push to DB
 	}
-	string getUserReport() { 
+	string getUserReport(string UserName) { 
 		// Format the name to add prefix
 		// Get user report from DB
 	}
