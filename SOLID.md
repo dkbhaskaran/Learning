@@ -141,18 +141,19 @@ If there is incompatibility then
 1. Type assertions for validation.
 2. When used in comparison and in arithmetic.
 
-### Open Close priciple : Open for extention and closed for modification. It summarizes the Interface segregation priciple and Liskov substitution priciple.
+### Open Close priciple
+Open for extention and closed for modification. It summarizes the Interface segregation priciple and Liskov substitution priciple.
 
 #### Dont use numeral parameters in an interface. 
 #### No ripples in a buf fixes. 
 		1. Extend the buggy class to create subclass and depricate the buggy one. 
 		
-### Dependency inversion priciple : Two elements
+### Dependency inversion priciple
+Two elements
 1. High level modules should not depend on low level modules.
 2. abstaction should not depend on details and details should not depend on abstaction.
 
 for example 
-
 ```
 struct AwsCloud {
     void uploadToS3Bucket(string filepath) { /* ... */ }	
@@ -196,7 +197,8 @@ struct AwsCloud {
 };
 ```
 
-### Single reposponsibility Principle : A class should have a single reposponsibility. Consider an example
+### Single reposponsibility Principle
+A class should have a single reposponsibility. Consider an example
 ```
 const string Prefix = "user-";
 
