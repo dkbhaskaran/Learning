@@ -109,7 +109,7 @@ Now lets do the same with Deck and shoe classes. Deck has 52 cards, Shoe has n D
 
 Shoe supports Burn (Remove n cards from the shoe) suggests that it has to be a new class no Deck itself by priciples of interface segregation. Deck can be created using builder design pattern.
 
-### Liskov inversion priciple
+### Liskov substitution priciple
 Any subclass should be replace any objects of super class without affecting the program behaviour. It is also known as strong behavioural subtyping.
 
 ```
