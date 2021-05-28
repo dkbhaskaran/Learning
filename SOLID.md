@@ -109,4 +109,114 @@ Now lets do the same with Deck and shoe classes. Deck has 52 cards, Shoe has n D
 
 Shoe supports Burn (Remove n cards from the shoe) suggests that it has to be a new class no Deck itself by priciples of interface segregation. Deck can be created using builder design pattern.
 
-##### Builder design pattern
+### Liskov inversion priciple
+Any subclass should be replace any objects of super class without affecting the program behaviour. It is also known as strong behavioural subtyping.
+
+```
+class Shuffler:
+	@staticmethod
+	def shuffle(deck):
+		pass
+	
+# Shuffle Class using a random module	
+
+class Shuffler:
+	@staticmethod
+	def shuffle(deck):
+		random.shuffle(deck)
+```
+ 
+Any application can pick up any of the above shuffler and use it. This is called late binding i.e the algorithm is choosen at the runtime.
+
+If there is incompatibility then 
+1. rethink :- is the interface required?
+2. Refactor :- Should the interface be pushed to superclass.
+
+#### Liskov substitution applies only upwards to superclass to any sibling of the superclass in a complex heirarchy.
+
+#### If the constructor of an derived class is different from that of the base class, it will not allow the derived class to be used in place of base class. A way to work around is to use default parameter in constructor.
+
+#### There should be almost never be a use case to use isinstance (dynamic_cast). But this is not a perfect world so it will be needed when
+
+1. Type assertions for validation.
+2. When used in comparison and in arithmetic.
+
+### Open Close priciple : Open for extention and closed for modification. It summarizes the Interface segregation priciple and Liskov substitution priciple.
+
+#### Dont use numeral parameters in an interface. 
+#### No ripples in a buf fixes. 
+		1. Extend the buggy class to create subclass and depricate the buggy one. 
+		
+### Dependency inversion priciple : Two elements
+1. High level modules should not depend on low level modules.
+2. abstaction should not depend on details and details should not depend on abstaction.
+
+for example 
+
+```
+struct AwsCloud {
+    void uploadToS3Bucket(string filepath) { /* ... */ }	
+};
+
+struct FileUploader {
+	FileUploader(AwsCloud &Cloud);
+	void scheduleUpload(string filepath);
+};
+```
+
+It shows that Fileuploader is dependent on AWS cloud struct...this is a problem when we decide to swith to a new cloud. Ideally FileUploader should not be dependent on any cloud service.
+
+Lets say we apply LSP and introduce a base class like this below 
+
+``` 
+struct Cloud {
+	void uploadToS3Bucket(string filepath) = 0;
+};
+
+struct AwsCloud {
+    void uploadToS3Bucket(string filepath) override { /* ... */ }	
+};
+
+struct FileUploader {
+	FileUploader(Cloud &Cloud);
+	void scheduleUpload(string filepath);
+};
+
+```
+This is again a problem as the Cloud uses the concrete dependency of uploadToS3Bucket. As another cloud may have a different interface.
+
+It should be modified as 
+``` 
+struct Cloud {
+	void upload(string filepath) = 0;
+};
+
+struct AwsCloud {
+    void upload(string filepath) override { /* ... */ }	
+};
+```
+
+### Single reposponsibility Principle : A class should have a single reposponsibility. Consider an example
+```
+const string Prefix = "user-";
+
+struct UserManager {
+	UserManager(Database &DB) : db(DB) {
+		// Add the prefix
+		// Push to DB
+	}
+	string getUserReport() { 
+		// Format the name to add prefix
+		// Get user report from DB
+	}
+};
+```
+
+Problems here are 
+1. The formatting of user name is done within usermanager.
+2. The handling of DB directly. 
+
+To resolve the problems it better to have 3 classes
+1. Database manager.
+2. Username formatter.
+3. UserManager
