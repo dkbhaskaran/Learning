@@ -126,12 +126,12 @@ int scores[NumTurns]; // fine
 ```
 This technique takes advantage of the fact that the values of an enumerated type can be used where ints are expected.
 
-### For simple constants, prefer const objects or enums to #defines.
-### For function-like macros, prefer inline functions to #defines.
+1. For simple constants, prefer const objects or enums to #defines.
+2. For function-like macros, prefer inline functions to #defines.
 
 # Item 3: Use const whenever possible.
-## Use const iterators when possible.
-## Use Const member functions, member functions that differ in constness can be overloaded. e.g.
+1. Use const iterators when possible.
+2. Use Const member functions, member functions that differ in constness can be overloaded. e.g.
 ```
 class TextBlock {
 public:
@@ -154,7 +154,7 @@ void print(const TextBlock& ctb) // in this function, ctb is const
 
 ```
 
-## Two types of constness philosophy, bitwise (physical) and logical constness. Bitwise const says we can not change the contents of the class in a const member function. This is implemented by the compiler. e.g. 
+Two types of constness philosophy, bitwise (physical) and logical constness. Bitwise const says we can not change the contents of the class in a const member function. This is implemented by the compiler. e.g. 
 ```
 class CTextBlock {
 public:
@@ -174,17 +174,17 @@ char *pc = &cctb[0];  // call the const operator[] to get a
 
 This type of implmentation is acceptable by the compiler but it isn't intuitive or logical.
 
-### Logical constness states that we can change the innerds of a class in a const function but the change should be oblivious to outside world. Thus comes handy *mutable* keyword.
-## Avoiding Duplication in const and Non-const Member Functions by calling the *const* function inside a *non-const* function with static and const casts.
+1. Logical constness states that we can change the innerds of a class in a const function but the change should be oblivious to outside world. Thus comes handy *mutable* keyword.
+2. Avoiding Duplication in const and Non-const Member Functions by calling the *const* function inside a *non-const* function with static and const casts.
 
 # Item 4: Make sure that objects are initialized before they’re used. Its better to initialize to avoid unwanted issues.
-## For non-member objects(?) of built-in types do it manually like
+For non-member objects(?) of built-in types do it manually like
 ```
 int x = 0;
 const char *Text = "Name";
 ```
-## For everything else, the rule is simple. In all constructors initialize everything.
-### Assignments are diffferent than initializations. e.g.
+For everything else, the rule is simple. In all constructors initialize everything.
+4.1 Assignments are diffferent than initializations. e.g.
 ```
 class ABEntry {
 	....
@@ -228,9 +228,9 @@ ABEntry::ABEntry()
 
 Member list initialization needs to be used in case of const reference or just const as they cannot be assigned.
 
-### The order of initialization in CPP classes is fixed to the order of declaration of the member variables. Thus in above class "theName" will always be initialized before "theAddress". This is true even if the order in member list initialization of these two are reversed. 
+4.2 The order of initialization in CPP classes is fixed to the order of declaration of the member variables. Thus in above class "theName" will always be initialized before "theAddress". This is true even if the order in member list initialization of these two are reversed. 
 
-### The initialization of static members in a class. The static object by definition exists from creation to end of program. There are local (in function/class) static variables and there are non-local static variables. The initialization order of non-local static objects is in-determinable. Thus we should not have a non-local static variable depend on another non-local static variable in another translation unit.
+4.3 The initialization of static members in a class. The static object by definition exists from creation to end of program. There are local (in function/class) static variables and there are non-local static variables. The initialization order of non-local static objects is in-determinable. Thus we should not have a non-local static variable depend on another non-local static variable in another translation unit.
 
 # Item 5: Know what functions C++ silently writes and calls.
 Usually when you declare and empty class, the compiler will declare a defualt constructor, destructor, copy constructor and copy assignment operator. If user has provided a constructor, compilers will not generate a default constructor. Thus 
@@ -267,7 +267,7 @@ private:
 ```
 Now compiler is confused on how to initialize nameValue or objectValue as they are reference/const and can be initialized only once. So the confused compiler doesn't generates code for copy assignment. And if there is a assignment the compier puts out and error.
 
-# Item 6: Explicitly disallow the use of compilergenerated functions you do not want
+# Item 6: Explicitly disallow the use of compiler generated functions you do not want
 I think this section is old. Just say "= delete" when not required. Or you can make then private in a base class.
 
 # Item 7: Declare destructors virtual in polymorphic base classes
@@ -277,7 +277,7 @@ class SpecialString: public std::string { // bad idea! std::string has a non-vir
 };
 ```
 
-## Usually a class will have virtual functions if it is intended for being used as a base class. If it is not declaring destructor virtual will make the size of class be increased. So the rule is use a virtual destructor only if you have a virtual function in your class. As a recommendation it is ok (?) to declare a pure virtual destructor if the base class is abstract class.
+7.1 Usually a class will have virtual functions if it is intended for being used as a base class. If it is not declaring destructor virtual will make the size of class be increased. So the rule is use a virtual destructor only if you have a virtual function in your class. As a recommendation it is ok (?) to declare a pure virtual destructor if the base class is abstract class.
 
 # Item 8: Prevent exceptions from leaving destructors.
 Consider a scenario where 
