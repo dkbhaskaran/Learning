@@ -295,7 +295,7 @@ void doSomething()
 }; 
 ```
 
-#Item 10 : Have assignment operators return reference to *this
+# Item 10 : Have assignment operators return reference to *this
 
 It helps with chain of assignment operation like 
 
@@ -303,7 +303,7 @@ It helps with chain of assignment operation like
 x = y = z = 15; 		// x = (y = (z = 15));
 ```
 
-The result of z = 15 is assigned to y. By returning the reference to *this enables this kind of operation. Although it is not mandatory, any code otherwise also will compile. It is just the convention followed for built-in types and stdard library. This is also true for other assignment operators like +=, -= *= etc.
+The result of z = 15 is assigned to y. By returning the reference to \*this enables this kind of operation. Although it is not mandatory, any code otherwise also will compile. It is just the convention followed for built-in types and stdard library. This is also true for other assignment operators like +=, -= *= etc.
 
 This also applies in cases when the rhs is of different type e.g.
 
@@ -316,7 +316,7 @@ class widget {
 };
 ```
 
-#item 11 : Handle assignment to self in operator= function.
+# Item 11 : Handle assignment to self in operator= function.
 Two key points 
 
 1. Make sure operator= is well-behaved when an object is assigned to itself. Techniques include comparing addresses of source and target objects, careful statement ordering, and copy-and-swap.
@@ -332,7 +332,7 @@ class widget {
 };
 ```
 
-#item 12 :  Copy all parts of an object. 
+# Item 12 :  Copy all parts of an object. 
 1. Copying functions should be sure to copy all of an object's data members and all of its base class parts.
 2. Don't try to implement one of the copying functions in terms of the other. Instead, put common functionality in a third function that both call.
 
