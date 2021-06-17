@@ -1,5 +1,146 @@
 [TOC]
 
+## Item 17 : Store newed objects in smart pointers in standalone statements
+
+1. Store newed objects in smart pointers in standalone statements. Failure to do this can lead to subtle
+resource leaks when exceptions are thrown.
+
+One must be mindful of the execptions that can occur while creating the smart pointers. Consider a function and a calle like below
+
+```
+void Process(std::shared_ptr<Widget> pW, int priority)
+
+// Call to the function is as 
+
+Process(std::shared_ptr<Widget>(new Widget), getPriority());
+```
+
+The order of evaluation of the arguments is to the Process function is not defined by the c++ standard and can be determined by the compiler. So consider and order like this 
+1. new Widget
+2. getPriority()
+3. Constructor for std::shared_ptr.
+
+Now if getPriority call results in a execption the memory allocated by statement "new Widget" is lost. 
+
+So it is good to have split into two statements like 
+
+```
+auto pW = std::shared_ptr<Widget>(new Widget);
+Process(pW, getPriority());
+
+
+## Item 16 : Use the same form in corresponding uses of new and delete.
+
+1. If you use [] in a new expression, you must use [] in the corresponding delete expression. If you don't use [] in a new expression, you mustn't use [] in the corresponding delete
+expression.
+2. Avoid Typedef in Arrays.
+
+
+During a new operator the object is created and its constructor is called. Similarly during the delete the destructor is called. Thus It is important to match the new and delete operators e.g consider
+
+```
+std::string *sPtr1 = new std::string;
+std::string *sPtr2 = new std::string[100];
+
+delete [] sPtr1; // Assume sPtr1 is an array and delete UB.
+delete sPtr2;    // Only delete one element, rest in UB?
+
+// Proper way to do this is 
+delete sPtr1;
+delete [] sPtr2;
+
+```
+
+Simply put if we use [] in new then [] must be used in delete. The problem arise when the object has different constructors which may end up using new with [] or not. Thus it becomes difficult in destructor to decide how to delete. Thus the rule is to use a form either with [] or not in all the constructors.
+
+It is more critical in case of typedefs consider the following examples
+
+```
+typedef std::string[4] Address; 
+
+MyAddress = new Address; // Equivalent to new string[4];
+
+delete Address; // Undefined 
+// need to use
+delete [] Address;
+```
+
+Thus to avoid such cases abstain from typedefing arrays.
+
+## Item 15 : Provide access to raw resource in resource managing class.
+
+1. APIs often require access to raw resources, so each RAII class should offer a way to get at the resource it manages.
+2. Access may be via explicit conversion or implicit conversion. In general, explicit conversion is safer, but implicit conversion is more convenient for clients.
+
+There are generally two ways to accomplish this (Remember std::unique_ptr) viz explicit and implicit.
+1. Explicit : provide a get() method.
+2. Implicit : Provide overloading of * and -> operator.
+
+One more way to do an implicit conversion is to overload the cast operator
+
+```
+BaseWrapper {
+
+	operator() const { return *B; }
+
+private:
+	Base *B;
+}
+
+// This has a major downside considering the below assignments
+
+BaseWrapper W1;
+Base B1 = W1; // Implicit cast and copying underlying object.
+```
+
+This can result in cases when W1 is out of scope but B1 is still active.
+
+
+## Item 14 : Think carefully in Resource managing classes
+
+The copying of a RAII class may not always make sense so we have following cases 
+1. Prevent copying : This is useful in case like below 
+
+```
+class lock_guard {
+	lock_guard(mutex *mt) : m(mt) {
+		lock(m);
+	}
+	
+	~lock_guard() {
+		unlock(m);
+	}
+private:
+	mutex *m;
+};
+
+```
+
+For the above 
+
+``` 
+mutex m1;
+
+lock_guard g1(m1);
+
+lock_guard g2(g1); // ??? What happens here
+```
+
+Doesn't makes sense. Thus delete the copy constructor. 
+
+2. Reference counting underlying resource
+Use std::shared_ptr on the resource.
+
+3. Perform a deep copy. Sometimes copy is possible.
+
+4. Transfer the ownership of the resource.
+
+
+## Item 13 : Use objects to manage resources
+
+Things to remember
+1. To prevent resource leak use resource managing classes or RAII mechanism. It is also possbile to use reference-counting smart pointer (RCSP). Well these are much better understood in c++11 std::unique_ptr and std::shared_ptr context.
+
 ## Item 12 :  Copy all parts of an object. 
 1. Copying functions should be sure to copy all of an object's data members and all of its base class parts.
 2. Don't try to implement one of the copying functions in terms of the other. Instead, put common functionality in a third function that both call.
