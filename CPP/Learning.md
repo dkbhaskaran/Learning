@@ -27,7 +27,7 @@ So it is good to have split into two statements like
 ```
 auto pW = std::shared_ptr<Widget>(new Widget);
 Process(pW, getPriority());
-
+```
 
 ## Item 16 : Use the same form in corresponding uses of new and delete.
 
@@ -120,9 +120,7 @@ For the above
 
 ``` 
 mutex m1;
-
 lock_guard g1(m1);
-
 lock_guard g2(g1); // ??? What happens here
 ```
 
@@ -134,7 +132,6 @@ Use std::shared_ptr on the resource.
 3. Perform a deep copy. Sometimes copy is possible.
 
 4. Transfer the ownership of the resource.
-
 
 ## Item 13 : Use objects to manage resources
 
