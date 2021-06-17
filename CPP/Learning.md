@@ -340,5 +340,23 @@ Usually the copy constructor and copy assignment should call respective function
 
 ```
 class base {
+public:
+	std::string getName() { return Name; }
 	
+private:
+	std::string Name;	
 };
+
+class Derived {
+public:
+	Derived(const Derived &Rhs) : Base(Rhs), Data(Rhs.Data) {}
+	
+	Derived &operator= (const Derived &Rhs) {
+		Base.operator=(Rhs);
+		Data = Rhs.Data;
+	}
+	
+private:
+	int Data;
+};
+```
