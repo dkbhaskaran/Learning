@@ -1,6 +1,121 @@
 [TOC]
 
-## Item 31: Minimize compilation dependencies between files.
+## Item 34: Differentiate between inheritance of interface and inheritance of implementation
+
+As as class designer you may want to inherit 
+1. Sometimes only the function interface  (like in the case of pure virtual function)
+2. Sometime the implementation also.
+
+
+For Pure virtual function it is cumbersome and duplication is involved so people generally make it virtual to simulate a default behavior. This can lead to undesirable side effects if a new derived class forget to overrid the default behaviour. Such a case can be avoided with 1. Pure virtual function and default implementation function. This default function must not be a virtual function.
+
+To have a seperate declaration and definition for the same function is not acceptable to several people. Thus to avoid this we can implement the pure virtual function and use it as the default for derived class calls like 
+
+```cpp
+class Airplane {
+public:
+	virtual void fly(const Airport& destination) = 0;
+...
+};
+
+void Airplane::fly(const Airport& destination) // an implementation of
+{ 	// a pure virtual function
+	// default code for flying an airplane to
+	// the given destination
+}
+
+class ModelA: public Airplane {
+public:
+	virtual void fly(const Airport& destination) { 
+		Airplane::fly(destination); 
+	}
+...
+};
+```
+
+In essence, fly has been broken into its two fundamental components. Its declaration specifies its interface (which derived classes must use), while its definition specifies its default behavior (which derived classes may use, but only if they explicitly request it). A nonvirtual member function specifies an invariant over specialization i.e which does not change over specialization. In other words 
+
+1. The purpose of declaring a non-virtual function is to have derived classes inherit a function interface as well as a mandatory implementation.
+
+
+In implmentatin there is an empirical rule of 80-20 which says 80% of the runtime is spend executing 20% of the code. 
+
+Thus in class design do not make the mistake of 
+1. Declaring all the members as non-virtual as it leaves no room for specialization.
+2. Declaring everything as virtual, that say class has nothing invariant for specialization.
+
+
+1. Inheritance of interface is different from inheritance of implementation. Under public inheritance, derived classes always inherit base class interfaces.
+2. Pure virtual functions specify inheritance of interface only.
+3. Simple (impure) virtual functions specify inheritance of interface plus inheritance of a default implementation.
+4. Non-virtual functions specify inheritance of interface plus inheritance of a mandatory implementation
+
+## Item 33: Avoid hiding inherited names
+
+Rules for name resolution scope
+1. Look in the local scope.
+2. Look in the scope of the class.
+3. Look into the scope of base class
+4. Look into the global scope.
+
+These rule can not be applied directly to inheritance and overloading. Consider a scenario
+```cpp
+class Base {
+private:
+	int x;
+public:
+	virtual void mf1() = 0;
+	virtual void mf1(int);
+	virtual void mf2();
+	void mf3();
+	void mf3(double);
+};
+
+// and 
+class Derived: public Base {
+public:
+	virtual void mf1();
+	void mf3();
+	void mf4();
+};
+
+Derived d;
+int x;
+...
+d.mf1();    // fine, calls Derived::mf1
+d.mf1(x);   // error! Derived::mf1 hides Base::mf1
+d.mf2();    // fine, calls Base::mf2
+d.mf3();    // fine, calls Derived::mf3
+d.mf3(x);   // error! Derived::mf3 hides Base::mf3
+```
+
+However this can be circumvented using "using" directive like 
+
+```cpp
+class Derived: public Base {
+public:
+	using Base::mf1; // make all things in Base named mf1 and mf3
+	using Base::mf3; // visible (and public) in Derived's scope
+	virtual void mf1();
+	void mf3();
+	void mf4();
+};
+
+d.mf1();   // still fine, still calls Derived::mf1
+d.mf1(x);  // now okay, calls Base::mf1
+d.mf2();   // still fine, still calls Base::mf2
+d.mf3();   // fine, calls Derived::mf3
+d.mf3(x);  // now okay, calls Base::mf3
+```
+
+This only works when the class is inherited as public. If the class is inherited private then "using" directive will not work as using will make all the symbols visible in derived class. But it cannot be the case with private inheritance. The trick there is to use call forwarding i.e. call base function in derived function.
+
+1. Names in derived classes hide names in base classes. Under public inheritance, this is never desirable.
+2. To make hidden names visible again, employ using declarations or forwarding functions.
+
+## Item 32: Inheritance and Object-Oriented Design
+
+Public inheritance means "is-a." Everything that applies to base classes must also apply to derived classes, because every derived class object is a base class object. The derivied object should either implement a runtime error or make it private member.
 
 ## Item 27: Minimize casting
 Different types of casts
