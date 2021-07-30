@@ -1,5 +1,222 @@
 [TOC]
 
+## Item 31: Minimize compilation dependencies between files.
+
+## Item 27: Minimize casting
+Different types of casts
+
+1. C-style casts
+```cpp
+(T) expression // cast expression to be of type T
+```
+2. Function-style casts use this syntax:
+```cpp
+T(expression) // cast expression to be of type T
+```
+
+The above are old styles of casting and essentially means the same. C++ provide new casts as 
+
+1. const_cast<T>(expression) : const_cast is typically used to cast away the constness of objects.
+2. dynamic_cast<T>(expression) : is primarily used to perform "safe downcasting," i.e., to determine whether an object is of a particular type in an inheritance hierarchy. It is the only cast that cannot be performed using the old-style syntax. It is also the only cast that may have a significant runtime cost.
+3. reinterpret_cast<T>(expression) : is intended for low-level casts that yield implementation-dependent (i.e., unportable) results, e.g., casting a pointer to an int. Such casts should be rare outside low-level code.
+4. static_cast<T>(expression) : can be used to force implicit conversions (e.g., non-const object to const object, int to double, etc.). It can also be used to perform the reverse of many such conversions (e.g., void* pointers to typed pointers, pointer-to-base to pointer-to-derived), though it cannot cast from const to non-const objects.
+
+Usually old style casting is not used these days. Only one place it looks is in explicit constructor call as shown below 
+
+
+```cpp
+class Widget {
+public:
+	explicit Widget(int size);
+	...
+};
+
+void doSomeWork(const Widget& w); 
+
+doSomeWork(Widget(15)); // create Widget from int with function-style cast
+doSomeWork(static_cast<Widget>(15)); // create Widget from int with C++-style cast
+```
+
+Type conversions of any kind (either explicit via casts or implicit by compilers) often lead to code that is executed at
+runtime. For example, in this code fragment,
+
+```cpp 
+double d = static_cast<double>(x)/y; // divide x by y, but use floating point division
+
+/* OR */
+
+Derived d;
+Base *pb = &d; // Offset is applied runtime to derive base pointer.
+
+``` 
+
+Note : Casting object addresses to char* pointers and then using pointer arithmetic on them almost always yields undefined behavior.
+
+
+## Item 26 : Postpone variable definitions as long as possible
+1. Delay the Variable desclaration until it is needed. 
+2. Delay a variable declaration until it can be constructed with initialization arguments. This way we replace default construction + assigment with copy constructor. For example change 
+```cpp
+	std::string encrypted;
+	encrypted = password
+	
+	// with
+	
+	std::string encrypted(password);
+```
+
+In case of loops do no try to define variables inside the loop. Instead define them outside and assign them values. This way we avoid several constructions and destructions.
+
+## Item 25 Consider support for a non-throwing swap
+
+## Item 24 Declare non-member functions when type conversions should apply to all parameters
+Consider the example of Rational class 
+```cpp
+class Rational {
+public:
+Rational(int numerator = 0, // ctor is deliberately not explicit;
+int denominator = 1); // allows implicit int-to-Rational
+// conversions
+int numerator() const; // accessors for numerator and
+int denominator() const; // denominator — see Item 22
+
+const Rational operator*(const Rational& rhs) const;
+
+private:
+...
+};
+
+// Now this can be used as 
+
+Rational oneEighth(1, 8);
+Rational oneHalf(1, 2);
+Rational result = oneHalf * oneEighth; // fine
+result = result * oneEighth; // fine
+
+// The below two statements are same
+result = oneHalf * 2; //fine
+result = oneHalf.operator*(2); // Implicit conversion of 2 to Rational.
+
+// The below two statements are same
+result = 2 * oneHalf; // error!
+result = operator*(2, oneHalf); //Error
+```
+
+For the second statement to compile the compiler looks for 
+1. An operator* support in 2, but obviously that doesn't exists.
+2. An non-member operator* function that has a integer and Rational as parameters in the same namespace or in global namespace.
+
+This problem is solved with a function in global space like 
+
+```cpp
+const Rational operator*(const Rational& lhs, // now a non-member
+const Rational& rhs) // function
+{
+return Rational(lhs.numerator() * rhs.numerator(),
+lhs.denominator() * rhs.denominator());
+}
+```
+
+Should this be a friend function to the class : No as this can be implemented with public members of Rational it should not be friend to class Rational. Ideally declaring a function related to a class should not be declared friend function. 
+
+
+## Item 23 Prefer non-member non-friend functions to member functions
+Consider an example 
+
+```cpp
+class WebBrowser {
+public:
+...
+void clearCache();
+void clearHistory();
+void removeCookies();
+...
+
+void clearEverything(); /* It just calls all the above methods */
+
+...
+};
+
+
+// OR a non member function like below 
+void clearBrowser(WebBrowser& wb)
+{
+wb.clearCache();
+wb.clearHistory();
+wb.removeCookies();
+}
+```
+
+Which is better? 
+
+Object-oriented principles dictate that data should be as encapsulated as possible. The greater something is encapsulated, then, the greater our ability to change. As a coarse-grained measure of how much code can see a piece of data, we can count the number of functions that can access that data: the more functions that can access it, the less encapsulated the data. 
+
+This is also the reason that a member is public then unlimited number of functions can access it and it provides least encapsulation. Now considering our example providing member function clearEverything reduceds encapsulation compared to providing a non member function clearBrowser. This reasoning is based on two conditions
+	1. The clearBrowser function is non-member and non-friend function.
+	2. The function can be a non friend class's static member. Then it doesn't violate above principle.
+
+In cpp the clearBrowser is defined in the same namespace.
+
+
+
+
+
+## Item 22 Declare data members private
+There are several reasons like 
+1. Set the access rights to the variable appropriately. The variable can be read only, read-write or write only.
+2. Encapsulation : The users need not know how the data is represented instead just how to access it. Encapsulatedness of a data member, is inversely proportional to the amount of code that might be broken if that data member changes.
+3. protected is no more encapsulated than public.
+
+## Item 21 Don't try to return a reference when you must return an object
+
+Returning const reference is efficient but dont return a reference to a local object.
+
+```cpp
+const Rational& operator*(const Rational& lhs, // warning! bad code!
+const Rational& rhs)
+{
+Rational result(lhs.n * rhs.n, lhs.d * rhs.d);
+return result;
+}
+```
+
+In the above scenario, it is obviously not a great idea to allocate with new since it doesn't provisions for free. Also it is not great to do return a static variable as it can be changed multiple times in an expression like 
+
+```cpp
+	if ((a * b) == (c * d)) { //Where all a, b, c, d are Rational objects.
+```
+The expression ((a*b) == (c*d)) will always evaluate to true, regardless of the values of a, b, c, and d!. This revelation is easiest to understand when the code is rewritten in its equivalent functional form:
+
+```cpp
+if (operator==(operator*(a, b), operator*(c, d)))
+```
+
+## Item 20 Prefer pass-by-reference-to-const to pass-by-value
+1. Helps in avoiding object splicing. This is a situation when pass-by-value function accepts base class while it is passe
+
+## Item 19 Treat class design as type design
+Few questions to be answered before we create a class are 
+1. How should objects of your new type be created and destroyed
+2. How should object initialization differ from object assignment
+3. What does it mean for objects of your new type to be passed by value
+4. What are the restrictions on legal values for your new type
+5. Does your new type fit into an inheritance graph
+6. What kind of type conversions are allowed for your new type
+7. What operators and functions make sense for the new type
+8. What standard functions should be disallowed
+9. Who should have access to the members of your new type
+10. What is the "undeclared interface" of your new type
+11. How general is your new type
+12. Is a new type really what you need
+
+
+## Item 18 Make interfaces easy to use correctly and hard to use incorrectly
+1. Good interfaces are easy to use correctly and hard to use incorrectly. Your should strive for these characteristics in all your interfaces.
+2. Ways to facilitate correct use include consistency in interfaces and behavioral compatibility with built-in types.
+3. Ways to prevent errors include creating new types, restricting operations on types, constraining object values, and eliminating client resource management responsibilities.
+4. const qualify the return values to avoid unexpected usage.
+
+
 ## Item 17 : Store newed objects in smart pointers in standalone statements
 
 1. Store newed objects in smart pointers in standalone statements. Failure to do this can lead to subtle
