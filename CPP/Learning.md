@@ -1,5 +1,96 @@
 [TOC]
 
+## Item 37: Never redefine a function's inherited default parameter value
+Consider a scenario
+```cpp
+// a class for geometric shapes
+class Shape {
+public:
+    enum ShapeColor { Red, Green, Blue };
+    // all shapes must offer a function to draw themselves
+    virtual void draw(ShapeColor color = Red) const = 0;
+};
+
+class Rectangle: public Shape {
+public:
+    // notice the different default parameter value — bad!
+    virtual void draw(ShapeColor color = Green) const {
+        std::cout << color;
+    }
+};
+
+class Circle: public Shape {
+public:
+    virtual void draw(ShapeColor color) const {
+        std::cout << color;
+    }
+};
+
+int main() {
+    Shape *ps; // static type = Shape*
+    Shape *pc = new Circle; // static type = Shape*
+    Shape *pr = new Rectangle; // static type = Shape*
+
+    pr->draw();   // calls Rectangle::draw(Shape::Red)!
+}
+```
+
+The reason for above behavior : virtual functions are dynamically bound, but default parameter values are statically bound. Why? To improve runtime efficiency as now compiler has to dynamically determine the default value also at runtime.
+
+On the otherhand now lets say we give all the shapes same default parameter, this results in code duplication and it means if changed in the base class we need to change everywhere. To work around this use non-virtual interface idiom. e.g.
+
+```cpp
+void draw(ShapeColor color = Red) const // now non-virtual
+{
+	doDraw(color); // calls a virtual
+}
+...
+private:
+	virtual void doDraw(ShapeColor color) const = 0;
+```
+Now draw must never be overriden and hence the default value is always RED.
+
+## Item 36: Never redefine an inherited non-virtual function
+Consider a scenario
+```cpp
+class B {
+public:
+	void mf();
+	...
+};
+
+class D: public B 
+{ 
+public:
+	void mf(); // hides B::mf;	
+};
+
+D x; // x is an object of type D
+
+B *pB = &x; // get pointer to x
+pB->mf(); // call mf through pointer, calls B::mf
+
+D *pD = &x; // get pointer to x
+pD->mf(); // call mf through pointer, calls D::mf
+```
+
+- The reason for above is non-virtual functions are statically bound while virtul functions are dynamically bound. This case is true for references also. Thus it is not recomended to re-define the non-virtual members of a class. 
+- The other way to see this is if D redefines mf, the D needs mf and also needs B's mf then D does not have a 'is-a' relationship with B. Conversly if B is-a D then mf must be declared virtual. 
+- The same reason must apply desctructors of polymorphic class.
+
+
+## Item 35: Consider alternatives to virtual functions
+The are alternatives to define virtual functions are discussed here.
+- Template Method Pattern via the Non-Virtual Interface Idiom : This school of thought says virtula methods should be declared private. The private virtual methods should be called from a public non-vitual method. This pattern strictly doesn't require to have the virtual function private, it can be protected.
+	- Benefits are to enforce do before and do after work for the virtual function. e.g. locking a mutex.
+	
+- The Strategy Pattern via Function Pointers : Function the "virtual function" as a function pointer to the constructor of the class.
+	- Benefits are like we can have different function for different instances of the class.
+	- These functions do not have access to non public members of the class. Better abstraction. 
+	
+- Functors.
+- The "Classic" Strategy Pattern : The way we put away the function in a a different classes virtual function. This pattern provides more flexibility on how to control the virtual function or specify this function with more derived classes. 
+
 ## Item 34: Differentiate between inheritance of interface and inheritance of implementation
 
 As as class designer you may want to inherit 
