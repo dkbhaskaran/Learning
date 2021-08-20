@@ -1,5 +1,105 @@
 [TOC]
+## Item 39: Use private inheritance judiciously
+If a class inherits another class privately then
 
+1. Members inherited from base class are private to derived class.
+2. Private inheritance means is-implemented-in-terms-of. If D privately inherits from B, it means that D objects are implemented in terms of B objects,
+
+Private inheritance means nothing during software design, only during software implementation. Thus when to chose composition or private inheritance? 
+*The answer is simple use composition when possible and use private inheritance when you must.*
+
+Consider a widget which needs a timer we have following implementation alternatives. 
+
+```cpp
+class Timer {
+public:
+	explicit Timer(int tickFrequency);
+	virtual void onTick() const; // automatically called for each tick
+...
+};
+
+class Widget: private Timer {
+private:
+	virtual void onTick() const; // look at Widget usage data, etc.
+...
+};
+```
+
+As we need to modify onTick, we need to inherit from Timer. But since widget is not is-a Timer public inheritance is not the best. But again if we have public widget onTick modifying the behavior then clients may think it is callable. Now we see that private inheritance is not necessary if we use the below approach
+
+```cpp
+class Widget {
+private:
+	class WidgetTimer: public Timer {
+	public:
+		virtual void onTick() const;
+		...
+	};
+
+WidgetTimer timer;
+...
+};
+```
+This has two advantages 
+1. No derived class of widget can modify onTick
+2. Reduce compilation dependencies
+
+
+*When to consider private inheritance*
+Consider a scenario
+
+```cpp
+
+class Empty {}; // has no data, so objects should
+// use no memory
+class HoldsAnInt { // should need only space for an int
+private:
+	int x;
+	Empty e; // should require no memory
+};
+```
+
+The size of Empty is not 0 but 1. Typically the compilers inserts a char to satisfy the class to be non-zero size free standing objects. If it is part of class HoldsAnInt then the alignment requirements kick in and it may use 8 bytes depending upon the compilers.
+
+This case is not applicable to private inheritance as the base class is not free standing now. Thus in below the size is 4 now. This is known as empty base optimization.
+
+```cpp
+class HoldsAnInt: private Empty {
+private:
+	int x;
+};
+```
+
+* TIDBIT : There are STL functions that are empty like unary_function or binary_function. Typically classes inherit from these and due to empty base optimization these do not add to size.*
+
+Thus private inheritance is justified when there are
+1. two classes not related by is-a where one either needs access to the protected members of another or needs to redefine one or more of its virtual functions.
+
+## Item 38: Model "has-a" or "is-implemented-in-terms-of" through composition
+Composition is the relationship between types that arises when objects of one type contain objects of another type. The term composition has lots of synonyms. It's also known as layering, containment, aggregation, and embedding. Composition has a meaning, too. In implmentation there are two domains, real world like people, animals etc and implmenation specifics like mutex, buffers, search trees etc. Thus
+1. Composition is "has-a" for the real world.
+2. Composition "is-implemented-in-terms-of" for implementation domain.
+
+Tidbit : std library set implementation has a space cost of 3 pointers per element. 
+
+### is-a and is-implemented-in-terms-of differences
+
+If you want to implementat a set with std::list so that we save space, one might think this is better 
+
+```cpp
+class MySet : public std::list<int> {
+...
+};
+```
+
+This is wrong as Myset cannot contain duplicates however the std::list can contain that. Thus is-a relationship is not idea here. A better way is to 
+
+```cpp
+class MySet {
+
+	std::list<int> MyList;
+};
+```
 ## Item 37: Never redefine a function's inherited default parameter value
 Consider a scenario
 ```cpp
