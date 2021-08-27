@@ -37,6 +37,7 @@ John, who is rich, is my neighbor. Now the second "is" is the verb of john as th
 - 50% of the girls *are* ...
 
 ***Collective nouns are singular when they are used as a whole and plural if thier members are referred.***
+
 - 1/4th of the workforce *is* unskilled. (workforce is a collective noun)
 - The commitee *has* submitted its report. (commitee is a collective noun)
 - Team India *has* won the match.
