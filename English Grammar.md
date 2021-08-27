@@ -1,6 +1,6 @@
 # English grammar
 
-*** Phrases, clauses, sentances ***
+***Phrases, clauses, sentances***
 - phrase is a collection of words without a subject verb combination. 
 	- *car* is a noun 
 	- *The car* is a noun phrase.
@@ -17,11 +17,11 @@
 Consider the example 
 	John, who is rich, is my neighbor. Now the second "is" is the verb of john as the sentance "John is my neighbor." is a well formed sentance. The first "is" the verb for who and who refers to John. *who is rich* is dependent clause. The other words are who, whom, that, which etc.
 
-*** Subject should agree with verb. e.g ***
-- Hi *is* rich -> Subject is "he"
-- John and Jack *are* rich -> Subject is "John and Jack"
+***Subject should agree with verb. e.g***
+- Hi *is* rich. (Subject is "he")
+- John and Jack *are* rich. (Subject is "John and Jack")
 - John and his mother *are* going to a movie.
-- one of my teachers are *has* agreed to do this. * The subject is "one" *
+- one of my teachers are *has* agreed to do this. (The subject is "one")
 - The discovery of trade routes *is* .... (The discovery is the subject)
 - The cost of mangoes has increased. (The cost is the subject)
 - There *is* a list of items on the table. (The subject is list)
@@ -35,7 +35,7 @@ Consider the example
 - one fourth of men *are* stupid. (men is the subject.)
 - 50% of the girls *are* ...
 
-*** Collective nouns are singular when they are used as a whole and plural if thier members are referred. ***
+***Collective nouns are singular when they are used as a whole and plural if thier members are referred.***
 - 1/4th of the workforce *is* unskilled. (workforce is a collective noun)
 - The commitee *has* submitted its report. (commitee is a collective noun)
 - Team India *has* won the match.
@@ -44,11 +44,11 @@ Consider the example
 - The staff *take* their seats in the meeting room. (collective noun but, each individual is taking their seats so plural verb is used.)
 
 
-*** Number are always singular. "The number" is singular and "A number" is plural***
+***Number are always singular. "The number" is singular and "A number" is plural***
 - Twenty thousand dollars *is* a big amount. 
 - A number of students *are* present.
 
-*** Proximity rule. The verb should agree to the subject near to it. e.g. ***
+***Proximity rule. The verb should agree to the subject near to it. e.g.***
 1. Neither John nor Jack are rich -> Neither/or is a conjunction and the subject close to the verb is singular. 
 2. Neither John nor his brothers **are** rich. -> Here we consider the proximity to the verb. "his brothers" is plural and thus the verb is plural. This is same for other forms of conjunctions below
 	1. Either x or y.
@@ -61,7 +61,7 @@ Consider the example
 - *Is* my boss or his adversaries going to win the case.
 - *Are* my friends or he going to win the race.
 
-*** Exception to proximity rule : When there is a phrase like "as well as" used to combine two subjects the verb should agree with the formar subject *** e.g.
+***Exception to proximity rule : When there is a phrase like "as well as" used to combine two subjects the verb should agree with the formar subject e.g.***
 - My father, as well as his friends *is* the responsible. ("as well as" -> it say in addition information for the subject.)
 - My father and his friend *are* responsible. ("And" does the joining two subjects so "are")
 - My friend with his wife *has* gone out. 
@@ -80,22 +80,22 @@ Other examples are
 - A man with twenty wifes *is* bound to have immense wealth.
 
 
-*** Subject verb agreement exception : When there is an auxiliary verb present we should use plural *** e.g.
+***Subject verb agreement exception : When there is an auxiliary verb present we should use plural. e.g.*** 
 - she must *have* come.
 - she ought to *have* come.
 - should/would/could/might/ought etc. 
 - The man along with his wife might *have* returned. 
 
 
-*** verb in dependent clause should agree with the actual subject. *** e.g.
+***verb in dependent clause should agree with the actual subject. e.g.*** 
 - The book, which *is* on the table, is mine.
 - The books, which *are* on the table is mine.
 - He is one of the men, who *are* allowed to take decision. (The who refers to what immediately proceeds it).
 - Mumbai is one of those cities that *have* great night life. (that refers to cities)
 
 
-*** Neither rule ***
-*** Neither is used when there are two people. For more than two we use None***
+***Neither rule***
+***Neither is used when there are two people. For more than two we use None***
 - Neither of the boys has come. Neither here is a pronoun. There are different pronouns
 	1. Definite pronoun
 		e.g. He, They, She, them etc.
@@ -110,8 +110,8 @@ Other examples are
 - Someone *has* not taken bath.
 - Each of us *has* the ability to score high.
 
-*** Some takes the form of the noun it qulifies. ***
+***Some takes the form of the noun it qulifies.***
 - Some of the milk *has* gone bad.
 - Some of the boys *are* missing
  
-*** Prepotional words "Despite" / "Inspite of". Inspite is always used with of. Inspite is used in positive scenario while despite is used in negative scenario. ***
+***Prepotional words "Despite" / "Inspite of". Inspite is always used with of. Inspite is used in positive scenario while despite is used in negative scenario.***
