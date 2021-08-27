@@ -1,6 +1,6 @@
 # English grammar
 
-***Phrases, clauses, sentances***
+## ***Phrases, clauses, sentances***
 - phrase is a collection of words without a subject verb combination. 
 	- *car* is a noun 
 	- *The car* is a noun phrase.
@@ -15,9 +15,10 @@
 	- *The car has broke down.*
 
 Consider the example 
-	John, who is rich, is my neighbor. Now the second "is" is the verb of john as the sentance "John is my neighbor." is a well formed sentance. The first "is" the verb for who and who refers to John. *who is rich* is dependent clause. The other words are who, whom, that, which etc.
 
-***Subject should agree with verb. e.g***
+John, who is rich, is my neighbor. Now the second "is" is the verb of john as the sentance "John is my neighbor." is a well formed sentance. The first "is" the verb for who and who refers to John. *who is rich* is dependent clause. The other words are who, whom, that, which etc.
+
+## ***Subject should agree with verb. e.g***
 - Hi *is* rich. (Subject is "he")
 - John and Jack *are* rich. (Subject is "John and Jack")
 - John and his mother *are* going to a movie.
