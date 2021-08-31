@@ -18,9 +18,12 @@ Consider the example
 
 John, who is rich, is my neighbor. Now the second "is" is the verb of john as the sentance "John is my neighbor." is a well formed sentance. The first "is" the verb for who and who refers to John. *who is rich* is dependent clause. The other words are who, whom, that, which etc.
 
-## ***Subject should agree with verb. e.g***
-- Hi *is* rich. (Subject is "he")
-- John and Jack *are* rich. (Subject is "John and Jack")
+## ***Subject should agree with verb.***
+
+***Plural subject must employ plural verbs.***
+
+- He *is* rich. (Subject is "he").
+- John and Jack *are* rich. (Subject is "John and Jack").
 - John and his mother *are* going to a movie.
 - one of my teachers are *has* agreed to do this. (The subject is "one")
 - The discovery of trade routes *is* .... (The discovery is the subject)
@@ -32,7 +35,6 @@ John, who is rich, is my neighbor. Now the second "is" is the verb of john as th
 - Pizza and burger *are* my favorite.
 - Slow and steady wins the race. (Same as above, it should be seen as an unit)
 - Few student *seem* to be interested in the program. 
-
 - one fourth of men *are* stupid. (men is the subject.)
 - 50% of the girls *are* ...
 
@@ -51,15 +53,15 @@ John, who is rich, is my neighbor. Now the second "is" is the verb of john as th
 - A number of students *are* present.
 
 ***Proximity rule. The verb should agree to the subject near to it. e.g.***
-1. Neither John nor Jack are rich -> Neither/or is a conjunction and the subject close to the verb is singular. 
-2. Neither John nor his brothers **are** rich. -> Here we consider the proximity to the verb. "his brothers" is plural and thus the verb is plural. This is same for other forms of conjunctions below
+- Neither John nor Jack are rich -> Neither/or is a conjunction and the subject close to the verb is singular. 
+- Neither John nor his brothers **are** rich. -> Here we consider the proximity to the verb. "his brothers" is plural and thus the verb is plural. This is same for other forms of conjunctions below
 	1. Either x or y.
 	2. Neither x nor y.
 	3. x or y.
-3. Either of my father or my brothers *have* done this -> "my brothers is close to the verb".
-4. My uncle or his children *are* ready to buy. -> "children is plural"
-5. Either the newspaper or the magazines have been misplaced. "Magazines is plural"
-6. My teacher or my friend *is* angry at me. 
+- Either of my father or my brothers *have* done this -> "my brothers is close to the verb".
+- My uncle or his children *are* ready to buy. -> "children is plural"
+- Either the newspaper or the magazines have been misplaced. "Magazines is plural"
+- My teacher or my friend *is* angry at me. 
 - *Is* my boss or his adversaries going to win the case.
 - *Are* my friends or he going to win the race.
 
