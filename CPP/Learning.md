@@ -1,4 +1,366 @@
 [TOC]
+## Item 44: Factor parameter-independent code out of templates.
+
+***Tidbit : Member functions of class templates are implicitly instantiated only when used.***
+
+Code duplication is a direct dis-advantage of templated classes for example consider the class 
+
+```cpp
+template<typename T, std::size_t n> 
+class SquareMatrix { 
+public:
+	...
+	void invert(); // invert the matrix in place
+};
+
+SquareMatrix<double, 5> sm1;
+...
+sm1.invert(); // call SquareMatrix<double, 5>::invert
+SquareMatrix<double, 10> sm2;
+...
+sm2.invert(); // call SquareMatrix<double, 10>::invert
+```
+
+Two copies of invert will be instantiated here. The functions won’t be identical, because one will work on 5 ×5 matrices and one will work on 10 ×10 matrices, but other than the constants 5 and 10, the two functions will be the same.
+
+One way to solve this bloat is to move the inverse to a separte class like below 
+
+```cpp
+template<typename T> // size-independent base class for
+class SquareMatrixBase { // square matrices
+protected:
+...
+	void invert(std::size_t matrixSize); // invert matrix of the given size
+};
+
+template<typename T, std::size_t n>
+class SquareMatrix: private SquareMatrixBase<T> { //Private as the relation is composition.
+private:
+	using SquareMatrixBase<T>::invert; // make base class version of invert visible in this class; 
+public:
+	void invert() { invert(n); } // make inline call to base class
+};
+
+};
+```
+
+As the SquareMatrixBase is templatized only on the type, all matrices holding a given type of object will share a single SquareMatrixBase class. They will thus share a single copy of that class’s version of invert. Provided the base class invert(n) is inline or else we end up with the same problem.
+
+SquareMatrixBase::invert is intended only to be a way for derived classes to avoid code replication, so it’s protected instead of being public. The additional cost of calling it should be zero, because derived classes’ inverts call the base class version using inline functions.
+
+However we have not addressed how data is passed to the base class, this is done by extending like below 
+
+```cpp
+template<typename T>
+class SquareMatrixBase {
+protected:
+	SquareMatrixBase(std::size_t n, T *pMem) // store matrix size and a
+				   : size(n), pData(pMem) {} // ptr to matrix values
+	void setDataPtr(T *ptr) { pData = ptr; } // reassign pData
+...
+private:
+	std::size_t size; // size of matrix
+	T *pData; // pointer to matrix values
+};
+```
+
+Trade offs 
+1. The invert with sizes have higher possibility of optimizations like constant propogation (substituting the values of known constants in expressions) and folding general instructions into immediate instructions. on the other hand having invert in the base class helps reducing the size of executable. 
+2. Having a base class also increases the size of the object and reduces encapsulations (as data is also available with base class).
+
+***Tidbit: Some linkers will not bloat code for STL containers with binary equivalent template parameters like vector<int> and vector<long> or list<int*>, list<const int*>, list<SquareMatrix<long, 3>*> etc.***
+
+Things to remember:
+
+1. Templates generate multiple classes and multiple functions, so any template code not dependent on a template parameter causes bloat.
+2. Bloat due to non-type template parameters can often be eliminated by replacing template parameters with function parameters or class data members.
+3. Bloat due to type parameters can be reduced by sharing implementations for instantiation types with identical binary representations.
+
+
+
+## Item 43: Know how to access names in templatized base classes.
+Consider the below example 
+
+```cpp 
+class CompanyA {
+public:
+...
+	void sendCleartext(const std::string& msg);
+	void sendEncrypted(const std::string& msg);
+...
+};
+
+... // classes for other companies
+class MsgInfo { ... }; // class for holding information used to create a message
+template<typename Company>
+class MsgSender {
+public:
+	... // ctors, dtor, etc.
+	void sendClear(const MsgInfo& info) {
+		std::string msg;
+		create msg from info;
+		Company c;
+		c.sendCleartext(msg);
+	}
+
+	void sendSecret(const MsgInfo& info) // similar to sendClear, except
+	{ ... } // calls c.sendEncrypted
+};
+
+
+// A specialized derived class to do logging and send a message. 
+template<typename Company>
+class LoggingMsgSender: public MsgSender<Company> {
+public:
+	... // ctors, dtor, etc.
+	void sendClearMsg(const MsgInfo& info) {
+		// write "before sending" info to the log;
+		sendClear(info); // call base class function; This code will not compile!
+		// write "after sending" info to the log;
+	}
+	...
+};
+```
+
+The statements "c.sendCleartext(msg);" in derived class compiles while "sendClear" in sendClearMsg does not compile. The reason being that base class templates may be specialized and that such specializations may not offer the same interface as the general template. As a result, it generally refuses to look in templatized base classes for inherited names. In some sense, when we cross from Object-Oriented C++ to Template C++, inheritance stops working. The below template specialization of MsgInfo makes it concrete 
+
+```cpp 
+template<> // a total specialization of MsgSender; the same as the general template, except sendClear is omitted
+class MsgSender<CompanyZ> { 
+public: 
+	... 
+	void sendSecret(const MsgInfo& info)
+	{ ... }
+};
+```
+Thus for above derived class LoggingMsgSender passing "CompanyZ" as template parameter will result in error. There are however 3 different ways to invoke "sendClear(info);" 
+
+```cpp
+// 1. Use this pointer 
+	this->sendClear(info);
+	
+// 2. Using "using" directive
+	using MsgSender<Company>::sendClear;
+	sendClear(info);
+
+// 3. Using direct base class method invocation.
+	MsgSender<Company>::sendClear(info); // Least desirable as explicit qualification turns off the virtual binding behavior.
+	
+	
+A problem scenario like if we use CompanyZ as template parameter later will be diagnozed as an error at a later stage of compilation.
+
+
+## Item 42: Understand the two meanings of typename.
+
+Consider the example 
+
+```cpp
+template<class T> class Widget; // uses “class”
+template<typename T> class Widget; // uses “typename”
+```
+
+As far as compiler is concerned there is not difference in the above declarations. But generally people use class when the template parameter can only be user defined types and typename if the template parameter is generic. There are exception to these as shown below
+
+### Dependent and non-dependent names in a template 
+Names in a template that are dependent on a template parameter are called dependent names. When a dependent name is nested inside a class, I call it a nested dependent name. C::const_iterator in below example is a nested dependent name. In fact, it’s a nested dependent type name, i.e., a nested dependent name that refers to a type.
+
+```cpp
+template<typename C> // print 2nd element in
+void print2nd(const C& container) // container;
+{ // this is not valid C++!
+	if (container.size() >= 2) {
+		C::const_iterator iter(container.begin()); // get iterator to 1st element; nested dependent name type
+		++iter; // move iter to 2nd element
+		int value = *iter; // copy that element to an int
+		std::cout << value; // print the int
+	}
+}
+```
+
+This becomes important in scenario like below 
+
+```cpp
+C::const_iterator * x;
+```
+
+Here we do not know if C::const_iterator is a static member and whole statement means multiplication or if it is just a pointer declaration until we resolve C. There is an ambiguity during parsing for such statements. The rule for resolving this is simple 
+
+### By default do not consider nested dependent names as types.
+
+Thus the above statement 
+
+```cpp
+C::const_iterator iter(container.begin());
+```
+
+The C::const_iterator is not a type unless specified and hence it is not a valid C++ statement. We need to modify it with 
+
+```cpp
+typename C::const_iterator iter(container.begin());
+```
+
+Thus anytime we refer to a nested dependent type name in a template, we must immediately precede it by the word typename. Consider this example 
+
+```cpp
+template<typename C> // typename allowed (as is “class”)
+void f(const C& container, // typename not allowed
+		typename C::iterator iter); // typename required
+```
+
+Since C is not a nested dependent type name keyword typename is not allowed. The exception to this rule is in the typename must not precede nested dependent type names in a list of base classes or as a base class identifier in a member initialization list. For example:
+
+```cpp
+template<typename T>
+class Derived: public Base<T>::Nested { // base class list: typename not
+public: // allowed
+	explicit Derived(int x) : Base<T>::Nested(x) { // base class identifier in mem. init. list: typename not allowed
+		typename Base<T>::Nested temp; // use of nested dependent type name not in a base class list or as a base class identifier in a mem. init. list: typename required
+		...
+	}
+};
+```
+
+Things to remember:
+
+1. When declaring template parameters, class and typename are interchangeable.
+2. Use typename to identify nested dependent type names, except in base class lists or as a base class identifier in a member initialization list.
+
+
+## Item 41: Understand implicit interfaces and compiletime polymorphism.
+Few definitions. Consider a function like below 
+
+```cpp
+void doProcessing(Widget& w)
+{
+	if (w.size() > 10 && w != someNastyWidget) {
+		Widget temp(w);
+		temp.normalize();
+		temp.swap(w);
+	}
+}
+```
+
+We know that w has two types of interfaces
+
+1. Explicit interfaces: The interfaces which are seen in the header file and these are something we can call. The behaviour does not change in runtime.
+2. Polymorphic interfaces: These are virtual interfaces which is enabled/selected during runtime.
+
+In template metaprogramming the above two characteristics take back seat instead we worry about implicit interfaces and compile time polymorphism. Consider the same example as 
+
+```cpp
+template<typename T>
+void doProcessing(T& w)
+{
+	if (w.size() > 10 && w != someNastyWidget) {
+		T temp(w);
+		temp.normalize();
+		temp.swap(w);
+	}
+}
+```
+Now we worry about the w of type T to support 
+
+1. Interfaces size, normalize and swap member functions. Copy constructor for creating temp and comparison for in-equality. The set of interfaces that are valid for compilation of templates are known as implicit interfaces.
+2. Calls that require instantiation of templates are catagorized into compile-time polymorphism. This is shown in the below example.
+
+```cpp
+template <class T>
+void custom_add (T a, T b) {
+    cout << "Template result = " << a + b << endl;
+}
+
+int main () {
+    int   p = 1;
+    int   i = 2;
+    float n = 10.1;
+    float e = 11.2;
+
+    custom_add<int>(p, i);    // type specifier <int> present
+    custom_add(n, e);         // no type specifier here
+    // custom_add(p, e);      // this call will cause compile-time error
+    return 0;
+}
+```
+
+Things to remember:
+
+1. Both classes and templates support interfaces and polymorphism.
+2. For classes, interfaces are explicit and centered on function signatures. Polymorphism occurs at runtime through virtual functions.
+3. For template parameters, interfaces are implicit and based on valid expressions. Polymorphism occurs during compilation through template instantiation and function overloading resolution
+
+
+
+## Item 40: Use multiple inheritance judiciously
+
+There are different problems like 
+
+### Ambiguity
+It becomes possible to inherit same name (e.g. function, typedef) from two different base classes. Consider the below e.g.
+
+```cpp 
+class BorrowableItem { // something a library lets you borrow
+public:
+	void checkOut(); // check the item out from the library
+	...
+};
+
+class ElectronicGadget {
+private:
+	bool checkOut() const; // perform self-test, return whether
+	... // test succeeds
+};
+
+class MP3Player: // note MI here
+	public BorrowableItem, // (some libraries loan MP3 players)
+	public ElectronicGadget
+{ ... }; // class definition is unimportant
+
+MP3Player mp;
+mp.checkOut(); // Ambigous, error
+mp.BorrowableItem::checkOut(); // This is how it is done
+```
+
+*Tidbit : In the above example the checkOut in class ElectronicGadget is not accessible but still call mp.checkOut() errors out. This is because the compiler first identifies the best match for the call then it looks for the accessiblity of that function. Here compiler gets confused as there are more than one match.*
+
+### Deadly MI diamond
+Consider the example 
+
+```cpp
+class File { ... };
+class InputFile: public File { ... };
+class OutputFile: public File { ... };
+class IOFile: public InputFile,
+public OutputFile
+{ ... };
+```
+
+This enables IOFile to have two paths to base class File. And subsequently there is a question whether there should be multiple copies of members of class File. C++ supports both options with default to have replicates. So in above case the members are replicated. But if we want no replicates we should use virtual inheritance like below
+
+```cpp 
+class File { ... };
+class InputFile: virtual public File { ... };
+class OutputFile: virtual public File { ... };
+class IOFile: public InputFile, public OutputFile
+{ ... };
+
+```
+
+If we are concerned about correctness, public inheritance should always be virtual. But this cannot be a general as 
+1. the data member access is costly for a virtual public inheritance 
+2. the size of class is higher without virtual inheritance.
+3. The initialization of base class is complex. The derived class must take the responsbility there however deep the base classes go.
+
+So use them judiciously and follow the below rules
+
+1. Don't use virtual inheritance
+2. Even if you use them, do have data members in base class to avoid initialization perils
+
+
+Things to remember 
+1. Multiple inheritance is more complex than single inheritance. It can lead to new ambiguity issues and to the need for virtual inheritance.
+2. Virtual inheritance imposes costs in size, speed, and complexity of initialization and assignment. It’s most practical when virtual base classes have no data.
+3. Multiple inheritance does have legitimate uses. One scenario involves combining public inheritance from an Interface class with private inheritance from a class that helps with implementation.
+
 ## Item 39: Use private inheritance judiciously
 If a class inherits another class privately then
 
