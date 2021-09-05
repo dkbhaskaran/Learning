@@ -145,7 +145,7 @@ Thus for above derived class LoggingMsgSender passing "CompanyZ" as template par
 
 // 3. Using direct base class method invocation.
 	MsgSender<Company>::sendClear(info); // Least desirable as explicit qualification turns off the virtual binding behavior.
-	
+```
 	
 A problem scenario like if we use CompanyZ as template parameter later will be diagnozed as an error at a later stage of compilation.
 
@@ -320,7 +320,7 @@ mp.checkOut(); // Ambigous, error
 mp.BorrowableItem::checkOut(); // This is how it is done
 ```
 
-*Tidbit : In the above example the checkOut in class ElectronicGadget is not accessible but still call mp.checkOut() errors out. This is because the compiler first identifies the best match for the call then it looks for the accessiblity of that function. Here compiler gets confused as there are more than one match.*
+***Tidbit : In the above example the checkOut in class ElectronicGadget is not accessible but still call mp.checkOut() errors out. This is because the compiler first identifies the best match for the call then it looks for the accessiblity of that function. Here compiler gets confused as there are more than one match.***
 
 ### Deadly MI diamond
 Consider the example 
@@ -432,7 +432,7 @@ private:
 };
 ```
 
-* TIDBIT : There are STL functions that are empty like unary_function or binary_function. Typically classes inherit from these and due to empty base optimization these do not add to size.*
+***Tidbit : There are STL functions that are empty like unary_function or binary_function. Typically classes inherit from these and due to empty base optimization these do not add to size.***
 
 Thus private inheritance is justified when there are
 1. two classes not related by is-a where one either needs access to the protected members of another or needs to redefine one or more of its virtual functions.
@@ -442,7 +442,7 @@ Composition is the relationship between types that arises when objects of one ty
 1. Composition is "has-a" for the real world.
 2. Composition "is-implemented-in-terms-of" for implementation domain.
 
-Tidbit : std library set implementation has a space cost of 3 pointers per element. 
+***Tidbit : std library set implementation has a space cost of 3 pointers per element.***
 
 ### is-a and is-implemented-in-terms-of differences
 
