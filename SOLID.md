@@ -45,12 +45,12 @@ We have some problems like
 
 ## SOLID - Guidlines to avoid design problems
 1. S : Single resposibility
-1.1 Kind of a summation of all the below. 
+* Kind of a summation of all the below. 
 
 2. O : Open/Closed
-2.1 What features needs to be exposed. 
-2.2 A good class is open to be extended may by using derived classes.
-2.3 A good class avoids necessasities of tweaking.
+* What features needs to be exposed. 
+* A good class is open to be extended may by using derived classes.
+* A good class avoids necessasities of tweaking.
 
 3. L : Liskov Substitution
 3.1 Objects of some base class S can be replaced with objects of any derived class of S.
