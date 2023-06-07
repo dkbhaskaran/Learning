@@ -53,16 +53,16 @@ We have some problems like
 * A good class avoids necessasities of tweaking.
 
 3. L : Liskov Substitution
-3.1 Objects of some base class S can be replaced with objects of any derived class of S.
-3.2 Constraints derived class design.
-3.3 Helps with polymorphism.
+* Objects of some base class S can be replaced with objects of any derived class of S.
+* Constraints derived class design.
+* Helps with polymorphism.
 
 4. I : Interface segregation
-Helps with test case design.
+* Helps with test case design.
 
 5. D : Dependency inversion.
-5.1 A direct dependency on a concrete class needs to be inverted.
-5.2 depend on abstract classes. 
+* A direct dependency on a concrete class needs to be inverted.
+* depend on abstract classes. 
 
 ### Some other OO principles
 6. TRY : Don't repeat yourself (no duplicate code.)
